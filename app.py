@@ -72,12 +72,12 @@ socketio = SocketIO(
 )
 
 # ═══════════════════════════════════════════════════════════════════════════════
-#  TIME UTILITIES
+#  TIME UTILITIES — Bangkok Time (ICT = UTC+7)
 # ═══════════════════════════════════════════════════════════════════════════════
-UTC = timezone.utc
-def now(): return datetime.now(UTC)
+ICT = timezone(timedelta(hours=7))
+def now(): return datetime.now(ICT)
 def ts(f="%H:%M:%S"): return now().strftime(f)
-def dts(): return now().strftime("%Y-%m-%d %H:%M:%S UTC")
+def dts(): return now().strftime("%Y-%m-%d %H:%M:%S ICT")
 
 def sanitize(obj):
     if obj is None: return None
@@ -579,13 +579,16 @@ def calc_obv(close, volume):
 #  CRYPTO MARKET SESSION (24/7 but with context)
 # ═══════════════════════════════════════════════════════════════════════════════
 def get_market_session():
+    """Crypto market session labels in Bangkok time (ICT = UTC+7)"""
     n = now(); h = n.hour
-    if 0 <= h < 4:     return "🌙 Late Night (Asia closing)", True
-    elif 4 <= h < 8:   return "🌅 Asia Morning", True
-    elif 8 <= h < 12:  return "☀️ Asia/Europe Overlap", True
-    elif 12 <= h < 16: return "🌍 Europe Session", True
-    elif 16 <= h < 20: return "🗽 US Session (Peak)", True
-    else:              return "🌆 US/Asia Transition", True
+    if 0 <= h < 7:     return "🌙 กลางคืน Late Night", True
+    elif 7 <= h < 10:  return "🌅 เช้า Morning", True
+    elif 10 <= h < 12: return "☀️ สาย Mid-Morning", True
+    elif 12 <= h < 14: return "🍜 เที่ยง Lunch", True
+    elif 14 <= h < 17: return "🌤️ บ่าย Afternoon", True
+    elif 17 <= h < 20: return "🌆 เย็น Evening", True
+    elif 20 <= h < 22: return "🗽 US Open (Peak Vol)", True
+    else:              return "🌙 ดึก Late Night", True
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -1222,18 +1225,20 @@ function cc(c){return catClass[c]||'cat-misc';}
 
 function uc(){
 const d=new Date();
-document.getElementById('clk').textContent=d.toLocaleTimeString('en-GB',{hour12:false,timeZone:'UTC'})+' UTC';
-const h=d.getUTCHours();let s='';
-if(h>=0&&h<4)s='🌙 Late Night';else if(h>=4&&h<8)s='🌅 Asia Morning';
-else if(h>=8&&h<12)s='☀️ Asia/EU Overlap';else if(h>=12&&h<16)s='🌍 Europe';
-else if(h>=16&&h<20)s='🗽 US Peak';else s='🌆 US/Asia';
+document.getElementById('clk').textContent=d.toLocaleTimeString('en-GB',{hour12:false,timeZone:'Asia/Bangkok'})+' ICT';
+const bkk=new Date(d.toLocaleString("en-US",{timeZone:"Asia/Bangkok"}));
+const h=bkk.getHours();let s='';
+if(h>=0&&h<7)s='🌙 กลางคืน Late Night';else if(h>=7&&h<10)s='🌅 เช้า Morning';
+else if(h>=10&&h<12)s='☀️ สาย Mid-Morning';else if(h>=12&&h<14)s='🍜 เที่ยง Lunch';
+else if(h>=14&&h<17)s='🌤️ บ่าย Afternoon';else if(h>=17&&h<20)s='🌆 เย็น Evening';
+else if(h>=20&&h<22)s='🗽 US Open (Peak Vol)';else s='🌙 ดึก Late Night';
 document.getElementById('ses').textContent=s;}
 setInterval(uc,1000);uc();
 
 function lo(m,t='info'){const e=document.getElementById('lg');
 const c={signal:'text-emerald-400',error:'text-red-400',info:'text-slate-400',sys:'text-violet-400'};
 const d=document.createElement('div');d.className=(c[t]||'text-slate-400')+' leading-snug';
-d.textContent=`[${new Date().toLocaleTimeString('en-GB',{timeZone:'UTC',hour12:false})}] ${m}`;
+d.textContent=`[${new Date().toLocaleTimeString('en-GB',{timeZone:'Asia/Bangkok',hour12:false})}] ${m}`;
 e.insertBefore(d,e.firstChild);while(e.children.length>80)e.removeChild(e.lastChild);}
 
 function fP(c){pf_=c;document.querySelectorAll('.pf').forEach(b=>{b.classList.toggle('bg-indigo-600/80',b.dataset.c===c);b.classList.toggle('bg-slate-700/60',b.dataset.c!==c)});rP();}
